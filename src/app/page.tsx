@@ -9,7 +9,7 @@ export default function Home() {
         <div className="relative">
           <div className="w-28 h-28 rounded-full bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 p-1 shadow-lg">
             <div className="w-full h-full rounded-full bg-white dark:bg-zinc-900 flex items-center justify-center text-3xl font-bold text-slate-800 dark:text-slate-100">
-              홍
+              최
             </div>
           </div>
           <span className="absolute bottom-1 right-1 bg-indigo-600 text-white p-1.5 rounded-full shadow-md">
@@ -20,16 +20,16 @@ export default function Home() {
         {/* 이름 및 직함 */}
         <div className="flex flex-col items-center gap-2">
           <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">
-            홍길동
+            최혁진
           </h1>
           <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200/50 dark:border-indigo-900">
-            🎓 대학생 &bull; 바이브 코딩 익스플로러
+            💻 프론트엔드 개발자 지망생 &bull; 멀티미디어 전공
           </span>
         </div>
 
         {/* 자기소개글 */}
         <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed max-w-xs font-normal">
-          안녕하세요! 바이브 코딩을 배우고 있는 대학생입니다.
+          인터랙티브한 사용자 경험과 모던 웹 기술에 관심이 많은 개발자 지망생 최혁진입니다. 디자인 감각과 프론트엔드 역량을 살려 가치 있는 웹 서비스를 만들어갑니다.
         </p>
 
         {/* 구분선 */}
@@ -38,7 +38,7 @@ export default function Home() {
         {/* 소셜 & 링크 버튼 */}
         <div className="w-full flex flex-col gap-3">
           <a
-            href="https://github.com"
+            href="https://github.com/cheesebab123"
             target="_blank"
             rel="noopener noreferrer"
             className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-medium text-sm transition-all hover:opacity-90 active:scale-[0.99] shadow-sm"
@@ -50,7 +50,7 @@ export default function Home() {
           </a>
 
           <a
-            href="mailto:gildong@example.com"
+            href="mailto:choieese.dev@gmail.com"
             className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-200 font-medium text-sm border border-slate-200/80 dark:border-zinc-700 transition-all hover:bg-slate-200/60 dark:hover:bg-zinc-700/60 active:scale-[0.99]"
           >
             <Mail className="w-4 h-4 text-indigo-500" />
@@ -62,18 +62,16 @@ export default function Home() {
             className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-200 font-medium text-sm border border-slate-200/80 dark:border-zinc-700 transition-all hover:bg-slate-200/60 dark:hover:bg-zinc-700/60 active:scale-[0.99]"
           >
             <BookOpen className="w-4 h-4 text-emerald-500" />
-            학습 블로그
+            기술 블로그
           </a>
         </div>
 
         {/* 푸터 카피라이트 */}
         <p className="text-xs text-slate-400 dark:text-zinc-500 pt-2">
-          &copy; {new Date().getFullYear()} 홍길동. All rights reserved.
+          &copy; {new Date().getFullYear()} 최혁진. All rights reserved.
         </p>
 
       </div>
     </main>
   );
 }
-
-
