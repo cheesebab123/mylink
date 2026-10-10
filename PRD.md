@@ -2,7 +2,7 @@
 
 > **💡 개발 진행 전략 (시연 및 단계별 접근)**:  
 > 본 프로젝트는 **시연(Demo) 및 검증**을 위해 단계별(Phased)로 진행됩니다.  
-> **1단계(현재)**에서는 백엔드 DB와 복잡한 관리자 대시보드/통계 기능을 보류하고, **Zustand + 로컬스토리지(localStorage)**를 활용하여 완성도 높은 **프로필 페이지와 3종 테마 전환**을 우선 구축합니다.
+> **1단계(현재)**에서는 백엔드 DB와 복잡한 관리자 대시보드/통계 기능을 보류하고, **shadcn/ui 아키텍처 기반의 토스 디자인 시스템(TDS)**과 **Tailwind CSS v4 + Zustand(로컬스토리지)**를 활용하여 완성도 높은 **프로필 페이지와 3종 테마 전환 시스템**을 우선 구축합니다.
 
 ---
 
@@ -11,6 +11,7 @@
 - **서비스 정의**: 나만의 링크, 포트폴리오, SNS, 작업물을 한곳에 모아 보여주는 1인 전용 올인원 링크트리 클론 서비스
 - **개발 목적**: 시연 가능한 인터랙티브 프로필 페이지 구축, 개인 브랜딩 강화, 다양한 테마 경험 제공
 - **핵심 가치**:
+  - 💙 **shadcn/ui 기반 토스 디자인 시스템 (TDS)**: Radix UI 프리미티브 & CVA 아키텍처 위에 TDS 비주얼 언어(토스 블루, Pretendard, 둥근 라운드, pressable 피드백) 완벽 융합
   - 🎨 **3종 테마 프리셋**: 토스 디자인 시스템(TDS, 기본), 네오브루탈리즘, 다크 글래스모피즘 즉시 전환
   - ⚡ **로컬 데이터 영속성**: Zustand + `localStorage`를 통한 데이터/테마 즉시 저장 및 유지
   - 📱 **모바일 최적화**: 모바일 셸 환경에 최적화된 반응형 UI 및 부드러운 인터랙션
@@ -44,16 +45,28 @@
 
 ---
 
-## 4. 기술 스택 (Tech Stack)
+## 4. 기술 스택 & UI 아키텍처 (Tech Stack & UI Architecture)
 
 | 구분 | 1단계 (현재 시연 범위) | 2단계 (향후 고도화 범위) |
 |---|---|---|
 | **Framework** | Next.js 16 (App Router) | Next.js 16 (App Router) |
 | **Language** | TypeScript | TypeScript |
-| **Styling** | Tailwind CSS v4, Lucide React | Tailwind CSS v4, Lucide React |
+| **UI Library** | **shadcn/ui** (CVA, Radix UI 프리미티브) | **shadcn/ui** |
+| **Design System** | **토스 디자인 시스템 (TDS)** 규격 및 컴포넌트 융합 | **토스 디자인 시스템 (TDS)** |
+| **Styling** | **Tailwind CSS v4** (CSS-first, `@theme`), Lucide React | Tailwind CSS v4, Lucide React |
 | **State Management** | **Zustand (with `persist` localStorage)** | Zustand + React Server Actions |
 | **Storage / DB** | **Browser `localStorage`** | **SQLite + Prisma ORM** (PostgreSQL 호환) |
 | **Authentication** | — (시연 모드) | JWT / Session 기반 관리자 인증 (`/admin`) |
+
+### 🎨 TDS × shadcn/ui 디자인 시스템 구축 원칙
+1. **shadcn/ui 표준 구조 준수**: 모든 컴포넌트는 `@/components/ui/*` 경로에 CVA(Class Variance Authority)와 Radix UI 프리미티브 기반으로 구성
+2. **토스 디자인 시스템(TDS) 스타일 주입**:
+   - **컬러 팔레트**: 카노니컬 토스 블루(`blue-500: #3182F6`), 깊은 중성색(`grey-900: #191F28` ~ `grey-50: #F9FAFB`)
+   - **타이포그래피**: Pretendard 기반 가독성 중심 스택
+   - **라운드 & 엘리베이션**: `radius-xl`(16px), `radius-3xl`(24px), `radius-full`(999px) 및 부드러운 소프트 섀도우
+   - **인터랙션**: 부드러운 스케일/오버레이 피드백 (`tds-pressable`)
+   - **컴포넌트 규격**: 4단 버튼 규격 (XL 56 / L 48 / M 40 / S 32), ListRow 패턴, 하단 고정 BottomCTA (56pt)
+3. **테마 프리셋 확장성**: CVA Variant 및 Tailwind v4 CSS 변수를 통해 토스(TDS), 네오브루탈리즘, 다크 글래스 테마를 유연하게 스위칭
 
 ---
 
@@ -67,10 +80,10 @@
       │    ├── 🎨 테마 스위처 (TDS / 네오브루탈리즘 / 다크 글래스 전환)
       │    └── 프로필 링크 공유 버튼
       │
-      ├── 프로필 헤더 카드
-      │    ├── 아바타, 이름, 직무/역할
-      │    ├── 프로젝트 제안 상태 칩 (Open for Work)
-      │    ├── 친절한 소개글 (Bio)
+      ├── 프로필 헤더 카드 (shadcn/ui Card 기반)
+      │    ├── 아바타 (Avatar), 이름, 직무/역할
+      │    ├── 프로젝트 제안 상태 칩 (Badge: Open for Work)
+      │    ├── 친절한 소개글 (Bio - 해요체)
       │    └── 스킬 태그 리스트
       │
       ├── 링크 목록 영역 (ListRows)
@@ -81,10 +94,10 @@
       ├── 연락처 & 이메일 카드
       │    └── 원클릭 이메일 복사 및 피드백
       │
-      ├── 하단 고정 Primary CTA (BottomCTA)
+      ├── 하단 고정 Primary CTA (BottomCTA - shadcn/ui Button 기반)
       │    └── 이메일 바로 보내기 액션
       │
-      └── 전역 토스트 (Toast)
+      └── 전역 토스트 (shadcn/ui Toast 피드백)
            └── 복사 완료 및 테마 변경 피드백 알림
 ```
 
@@ -97,24 +110,24 @@
    - `profile`: 이름, 역할, 핸들, 소개글, 아바타, 상태 뱃지, 스킬 목록
    - `links`: 링크 목록(id, title, url, description, icon, badge, clicks, isActive)
    - `theme`: 현재 선택된 테마 (`'toss'` | `'neobrutalism'` | `'glass'`)
-   - 초기 접속 시 기본 데이터가 로드되며, 수정/클릭 발생 시 로컬스토리지에 자동 동기화
+   - 초기 접속 시 기본 더미 데이터(`src/data/mockData.ts`)가 로드되며, 수정/클릭 발생 시 로컬스토리지에 자동 동기화
 
-2. **3종 테마 시스템 (Theme Switcher)**
+2. **3종 테마 시스템 (shadcn/ui 기반 스킨 연동)**
    - **Toss (토스 디자인 시스템, 기본)**: 미니멀 그레이스케일, 토스 블루(`#3182F6`), 둥근 라운드, 차분하고 정갈한 가독성
    - **Neobrutalism (네오브루탈리즘)**: 볼드한 블랙 보더, 하드 섀도우, 비비드 옐로우/핑크 팝 컬러, 레트로 윈도우 UI
    - **Dark Glass (다크 글래스모피즘)**: 딥 다크 배경, 반투명 블러 백드롭, 사이버 네온 글로우
 
 3. **인터랙션 및 피드백**
    - 링크 클릭 시 카운트 증가 및 외부 링크 새 탭 오픈
-   - 이메일 복사 / 링크 공유 시 즉각적인 토스트 팝업 안내
+   - 이메일 복사 / 링크 공유 시 즉각적인 shadcn 토스트 팝업 안내
    - 부드러운 테마 전환 트랜지션
 
 ### 6.2. 2단계: 관리자 대시보드 및 백엔드 고도화 (추후 진행)
 1. **관리자 인증 (`/admin/login`)**: 비밀번호 기반 세션 인증
 2. **링크 관리 대시보드 (`/admin`)**:
-   - 링크 CRUD 모달 및 폼
+   - 링크 CRUD 모달(Dialog) 및 폼(Form/Input)
    - `@dnd-kit` 드래그 앤 드롭 링크 순서 변경
-   - 공개/비공개 토글 스위치
+   - 공개/비공개 토글 스위치(Switch)
 3. **클릭 통계 및 분석**: 링크별 실시간 클릭수 집계 및 간단한 통계 지표
 4. **Prisma + DB 영속화**: 서버 사이드 데이터베이스 저장
 
@@ -141,12 +154,15 @@ export interface LinkItem {
   id: string;
   title: string;
   url: string;
-  description: string;
-  icon: string; // 'Github' | 'BookOpen' | 'Layers' | 'Palette' | 'ExternalLink' 등
+  description?: string;
+  icon?: string;
   badge?: string;
+  category?: string;
   order: number;
   isActive: boolean;
   clicks: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface MyLinkState {
@@ -162,10 +178,33 @@ export interface MyLinkState {
 
 ---
 
-## 8. 단계별 개발 마일스톤 (Milestones)
+## 8. 기본 더미 데이터 명세 (Mock / Initial Data)
+
+초기 로컬스토리지 미설정 시 또는 초기화 시 아래의 표준 더미 데이터([`src/data/mockData.ts`](file:///c:/project/my-link-hj/src/data/mockData.ts))를 기본 상태로 로드합니다:
+
+### 8.1. 프로필 더미 데이터 (`DUMMY_PROFILE`)
+- **이름 / 핸들**: 최혁진 (`@cheesebab123`) / 아바타: "최"
+- **직무**: 프론트엔드 개발자
+- **소개글**: "인터랙티브한 사용자 경험과 감각적인 UI/UX를 고민하며 가치 있는 서비스를 만들어요."
+- **이메일**: `choieese.dev@gmail.com`
+- **상태 뱃지**: "새로운 프로젝트 제안을 환영해요" (활성화)
+- **기술 스택**: `["React", "Next.js", "TypeScript", "Tailwind CSS", "UI/UX Design", "멀티미디어"]`
+
+### 8.2. 링크 목록 더미 데이터 (`DUMMY_LINKS` 6종)
+1. **GitHub 저장소** (`https://github.com/cheesebab123`): 오픈소스 기여 및 개인 프로젝트 소스 코드 (뱃지: `오픈소스`, 아이콘: `Github`, 초기 클릭수: `128`)
+2. **기술 블로그 & 개발 회고** (`https://velog.io/@cheesebab123`): 프론트엔드 학습 기록과 트러블슈팅 아티클 (뱃지: `아티클`, 아이콘: `BookOpen`, 초기 클릭수: `245`)
+3. **마이링크 (myLink) 프로젝트** (`https://github.com/cheesebab123/mylink`): Next.js 16과 토스 디자인 시스템(TDS)으로 구축한 올인원 링크트리 (뱃지: `포트폴리오`, 아이콘: `Layers`, 초기 클릭수: `312`)
+4. **UI/UX 인터랙션 쇼케이스** (`https://getdesign.kr`): 멀티미디어 전공 기반의 감각적인 웹 인터페이스 & 모션 작업물 (뱃지: `디자인`, 아이콘: `Palette`, 초기 클릭수: `89`)
+5. **상세 이력서 & 포트폴리오 노션** (`https://notion.so/cheesebab123`): 경력 기술서, 프로젝트 회고, 주요 성과 정리 (뱃지: `이력서`, 아이콘: `FileText`, 초기 클릭수: `174`)
+6. **LinkedIn 프로필** (`https://linkedin.com/in/cheesebab123`): 커리어 네트워킹 및 커피챗 제안 (뱃지: `네트워킹`, 아이콘: `Share2`, 초기 클릭수: `56`)
+
+---
+
+## 9. 단계별 개발 마일스톤 (Milestones)
 
 - **[현재] Phase 1: 시연용 프로필 페이지 & 로컬 테마 시스템**
-  - Zustand `persist` 스토어 구성 (`localStorage`)
+  - shadcn/ui 기반 컴포넌트 아키텍처 및 TDS 디자인 토큰 확립
+  - `src/data/mockData.ts` 더미 데이터를 Zustand `persist` 스토어 기본값으로 연동
   - 3종 테마 전환 스위처 및 테마별 UI 스타일 완성
   - 프로필, 링크 리스트, 연락처 카드, 토스트 연동
 - **[보류/차후] Phase 2: 관리자 대시보드 & DB 구축**

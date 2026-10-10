@@ -4,6 +4,7 @@ export interface LinkItem {
   url: string;
   description?: string;
   icon?: string;
+  badge?: string;
   category?: string;
   clicks: number;
   isActive: boolean;
