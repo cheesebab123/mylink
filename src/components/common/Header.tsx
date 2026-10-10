@@ -5,22 +5,22 @@ import { Link2 } from "lucide-react";
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-50 border-b border-zinc-200 bg-white/80 backdrop-blur-md dark:border-zinc-800 dark:bg-black/80">
+    <header className="sticky top-0 z-50 border-b border-[#E5E8EB] bg-white/90 backdrop-blur-md">
       <Container size="lg">
-        <div className="flex h-16 items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 font-bold text-xl text-zinc-900 dark:text-white">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white">
-              <Link2 className="h-5 w-5" />
+        <div className="flex h-14 items-center justify-between">
+          <Link href="/" className="flex items-center gap-2 font-bold text-lg text-[#191F28]">
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#3182F6] text-white">
+              <Link2 className="h-4 w-4" />
             </div>
             <span>{APP_CONFIG.name}</span>
           </Link>
 
-          <nav className="flex items-center gap-6">
+          <nav className="flex items-center gap-1">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm font-medium text-zinc-600 transition-colors hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white"
+                className="px-3 py-1.5 rounded-xl text-sm font-semibold text-[#4E5968] hover:bg-[#F2F4F6] hover:text-[#191F28] tds-pressable transition-colors"
               >
                 {link.label}
               </Link>

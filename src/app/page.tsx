@@ -4,16 +4,14 @@ import React, { useState } from "react";
 import {
   Mail,
   BookOpen,
-  Sparkles,
-  ExternalLink,
+  ChevronRight,
   Copy,
   Check,
   Share2,
   Layers,
   Palette,
-  ArrowUpRight,
-  Heart,
-  Globe,
+  ExternalLink,
+  Sparkles,
 } from "lucide-react";
 
 function GithubIcon({ className = "w-5 h-5" }: { className?: string }) {
@@ -36,7 +34,7 @@ export default function Home() {
     setCopiedType(type);
     setTimeout(() => {
       setCopiedType(null);
-    }, 2000);
+    }, 2200);
   };
 
   const handleShare = () => {
@@ -45,256 +43,232 @@ export default function Home() {
     }
   };
 
-  const skills = [
-    { name: "React", bg: "bg-cyan-500/10 text-cyan-300 border-cyan-500/20 hover:border-cyan-400/40" },
-    { name: "Next.js", bg: "bg-zinc-800/80 text-zinc-200 border-zinc-700/60 hover:border-zinc-500" },
-    { name: "TypeScript", bg: "bg-blue-500/10 text-blue-300 border-blue-500/20 hover:border-blue-400/40" },
-    { name: "Tailwind CSS", bg: "bg-teal-500/10 text-teal-300 border-teal-500/20 hover:border-teal-400/40" },
-    { name: "UI / UX", bg: "bg-purple-500/10 text-purple-300 border-purple-500/20 hover:border-purple-400/40" },
-    { name: "Multimedia", bg: "bg-rose-500/10 text-rose-300 border-rose-500/20 hover:border-rose-400/40" },
-  ];
+  const skills = ["React", "Next.js", "TypeScript", "Tailwind CSS", "UI/UX", "멀티미디어"];
 
-  const links = [
+  const linkRows = [
     {
       title: "GitHub 저장소",
-      description: "프로젝트 소스 코드와 커밋 기록 구경하기",
+      subtitle: "진행한 프로젝트와 소스 코드를 볼 수 있어요",
       href: "https://github.com/cheesebab123",
       icon: GithubIcon,
-      iconBg: "bg-zinc-900 text-white border border-zinc-700 shadow-md",
-      badge: "Open Source",
+      badge: "오픈소스",
     },
     {
-      title: "기술 블로그 & 지식 기록",
-      description: "새롭게 배운 웹 기술과 개발 인사이트 정리",
+      title: "기술 블로그 & 기록",
+      subtitle: "새롭게 배운 기술과 개발 회고를 모아뒀어요",
       href: "https://github.com/cheesebab123",
       icon: BookOpen,
-      iconBg: "bg-gradient-to-tr from-emerald-500 to-teal-400 text-white shadow-emerald-500/25",
-      badge: "Tech Blog",
+      badge: "아티클",
     },
     {
-      title: "프로젝트 아카이브",
-      description: "인터랙티브 웹 앱 및 프론트엔드 작업물",
+      title: "프로젝트 모음",
+      subtitle: "직접 기획하고 만든 웹 서비스를 둘러보세요",
       href: "https://github.com/cheesebab123?tab=repositories",
       icon: Layers,
-      iconBg: "bg-gradient-to-tr from-indigo-500 to-violet-500 text-white shadow-indigo-500/25",
-      badge: "Projects",
+      badge: "포트폴리오",
     },
     {
-      title: "디자인 & 크리에이티브",
-      description: "멀티미디어 전공 기반의 UI/UX 디자인 모음",
+      title: "디자인 & 인터랙션 작업",
+      subtitle: "멀티미디어 전공 기반의 UI/UX 디자인이에요",
       href: "https://github.com/cheesebab123",
       icon: Palette,
-      iconBg: "bg-gradient-to-tr from-pink-500 to-rose-400 text-white shadow-rose-500/25",
-      badge: "Creative",
+      badge: "디자인",
     },
   ];
 
   return (
-    <main className="min-h-screen relative flex items-center justify-center py-12 px-4 sm:px-6 bg-[#090a10] text-slate-100 overflow-hidden selection:bg-indigo-500 selection:text-white">
-      {/* 앰비언트 글로우 배경 효과 */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] bg-gradient-to-tr from-indigo-600/25 via-purple-600/20 to-pink-500/15 blur-[140px] rounded-full pointer-events-none -z-0" />
-      <div className="absolute bottom-10 left-1/3 w-[380px] h-[380px] bg-gradient-to-br from-blue-600/15 via-cyan-500/15 to-emerald-500/10 blur-[130px] rounded-full pointer-events-none -z-0" />
-
-      {/* 섬세한 그리드 배경 오버레이 */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff04_1px,transparent_1px),linear-gradient(to_bottom,#ffffff04_1px,transparent_1px)] bg-[size:36px_36px] pointer-events-none" />
-
-      {/* 메인 프로필 카드 */}
-      <div className="relative z-10 w-full max-w-lg bg-zinc-900/60 backdrop-blur-2xl border border-white/10 rounded-3xl p-6 sm:p-9 shadow-2xl shadow-black/80 flex flex-col items-center">
+    <div className="min-h-screen bg-[#F9FAFB] text-[#191F28] flex flex-col justify-between items-center pb-24">
+      {/* TDS 모바일 셸 컨테이너 (최대 440px) */}
+      <main className="w-full max-w-[440px] px-5 sm:px-6 pt-3 flex flex-col gap-4">
         
-        {/* 상단 상태 바 & 공유 버튼 */}
-        <div className="w-full flex justify-between items-center mb-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs font-medium tracking-wide">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+        {/* TopBar (56pt 상단 내비게이션 바) */}
+        <header className="h-14 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-lg text-[#191F28] tracking-tight">
+              myLink
             </span>
-            <span>Open to Opportunities</span>
           </div>
 
           <button
             onClick={handleShare}
             aria-label="링크 공유하기"
-            className="p-2 rounded-xl bg-zinc-800/80 hover:bg-zinc-700/80 border border-white/10 text-zinc-300 hover:text-white transition-all active:scale-95 flex items-center gap-1.5 text-xs font-medium cursor-pointer"
-            title="프로필 링크 복사"
+            className="w-10 h-10 rounded-full flex items-center justify-center text-[#4E5968] hover:bg-[#F2F4F6] tds-pressable transition-colors cursor-pointer"
+            title="프로필 링크 공유하기"
           >
-            {copiedType === "link" ? (
-              <>
-                <Check className="w-3.5 h-3.5 text-emerald-400" />
-                <span className="text-emerald-400">복사됨</span>
-              </>
-            ) : (
-              <>
-                <Share2 className="w-3.5 h-3.5" />
-                <span>공유</span>
-              </>
-            )}
+            <Share2 className="w-5 h-5" />
           </button>
-        </div>
+        </header>
 
-        {/* 아바타 프로필 사진 영역 */}
-        <div className="relative mb-5 group cursor-default">
-          <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 p-[3px] shadow-2xl shadow-indigo-500/30 group-hover:shadow-indigo-500/50 transition-all duration-300 group-hover:scale-105">
-            <div className="w-full h-full rounded-full bg-zinc-950 border-2 border-zinc-800/80 flex items-center justify-center relative overflow-hidden">
-              <span className="text-4xl sm:text-5xl font-black bg-gradient-to-br from-white via-zinc-100 to-zinc-400 bg-clip-text text-transparent select-none">
-                최
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-t from-indigo-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+        {/* 프로필 메인 카드 (TDS 24px Radius Elevated Card) */}
+        <section className="bg-white rounded-3xl p-6 border border-[#E5E8EB] tds-shadow-sm flex flex-col gap-5">
+          <div className="flex items-center gap-4">
+            {/* 아바타 (TDS 56px 라운드 아바타) */}
+            <div className="w-14 h-14 rounded-2xl bg-[#E8F3FF] text-[#3182F6] font-bold text-2xl flex items-center justify-center shrink-0">
+              최
             </div>
-          </div>
-          
-          <div className="absolute -bottom-1 -right-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-2 rounded-full shadow-lg border-2 border-zinc-900">
-            <Sparkles className="w-4 h-4 animate-pulse" />
-          </div>
-        </div>
 
-        {/* 이름 및 타이틀 */}
-        <div className="flex flex-col items-center gap-1.5 text-center mb-4">
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
-              최혁진
-            </h1>
-            <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-              dev
-            </span>
-          </div>
-
-          <p className="text-xs sm:text-sm text-zinc-400 font-mono flex items-center gap-1.5">
-            <span>@cheesebab123</span>
-            <span className="text-zinc-600">•</span>
-            <span className="text-zinc-300">Front-End Developer</span>
-          </p>
-        </div>
-
-        {/* 자기소개 문구 */}
-        <p className="text-zinc-300 text-sm leading-relaxed text-center max-w-sm mb-5 font-normal">
-          인터랙티브한 사용자 경험과 감각적인 UI를 만들어가는 프론트엔드 개발자 최혁진입니다.
-          멀티미디어 디자인 감각과 모던 웹 기술로 더 직관적이고 몰입감 있는 웹을 만듭니다.
-        </p>
-
-        {/* 기술 스택 & 관심사 태그 */}
-        <div className="flex flex-wrap items-center justify-center gap-1.5 mb-6 max-w-md">
-          {skills.map((skill) => (
-            <span
-              key={skill.name}
-              className={`px-2.5 py-1 rounded-lg text-xs font-medium border backdrop-blur-md ${skill.bg} transition-all duration-200 hover:scale-105 select-none`}
-            >
-              {skill.name}
-            </span>
-          ))}
-        </div>
-
-        {/* 구분선 */}
-        <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent mb-6" />
-
-        {/* 주요 링크 목록 */}
-        <div className="w-full flex flex-col gap-3 mb-6">
-          {links.map((link, idx) => {
-            const Icon = link.icon;
-            return (
-              <a
-                key={idx}
-                href={link.href}
-                target={link.href.startsWith("http") ? "_blank" : undefined}
-                rel={link.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                className="group relative flex items-center justify-between p-3.5 sm:p-4 rounded-2xl bg-zinc-800/40 hover:bg-zinc-800/80 border border-white/5 hover:border-white/20 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-indigo-500/5"
-              >
-                <div className="flex items-center gap-3.5">
-                  <div
-                    className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0 ${link.iconBg} transition-transform group-hover:scale-105`}
-                  >
-                    <Icon className="w-5 h-5" />
-                  </div>
-                  <div className="text-left">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-sm sm:text-base text-zinc-100 group-hover:text-white transition-colors">
-                        {link.title}
-                      </h3>
-                      {link.badge && (
-                        <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-zinc-700/60 text-zinc-300 border border-white/5">
-                          {link.badge}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-xs text-zinc-400 line-clamp-1 mt-0.5">
-                      {link.description}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="p-2 rounded-xl text-zinc-500 group-hover:text-zinc-200 group-hover:bg-zinc-700/50 transition-all">
-                  <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                </div>
-              </a>
-            );
-          })}
-        </div>
-
-        {/* 이메일 바로 복사 & 연락처 박스 */}
-        <div className="w-full bg-gradient-to-r from-indigo-950/40 via-purple-950/40 to-pink-950/40 border border-indigo-500/20 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 mb-6">
-          <div className="flex items-center gap-3 text-left w-full sm:w-auto">
-            <div className="w-9 h-9 rounded-xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shrink-0">
-              <Mail className="w-4 h-4" />
-            </div>
-            <div className="overflow-hidden">
-              <p className="text-[11px] text-zinc-400 font-medium">Contact Email</p>
-              <p className="text-xs sm:text-sm font-mono text-zinc-200 truncate">
-                choieese.dev@gmail.com
+            <div className="flex flex-col gap-0.5">
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl font-bold text-[#191F28] tracking-tight">
+                  최혁진
+                </h1>
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-[#E8F3FF] text-[#3182F6]">
+                  프론트엔드
+                </span>
+              </div>
+              <p className="text-sm text-[#8B95A1] font-medium">
+                @cheesebab123
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+          {/* 친절한 해요체 소개글 */}
+          <p className="text-[15px] leading-relaxed text-[#4E5968] font-normal">
+            인터랙티브한 사용자 경험과 감각적인 UI를 고민하는 개발자예요. 멀티미디어 디자인 감각과 모던 웹 기술을 살려 편리한 디지털 경험을 만들어요.
+          </p>
+
+          {/* 상태 배지 (Chip) */}
+          <div className="flex items-center gap-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#E8F3FF] text-[#3182F6] text-xs font-semibold">
+              <span className="w-2 h-2 rounded-full bg-[#3182F6] animate-pulse" />
+              <span>새로운 프로젝트 제안을 환영해요</span>
+            </div>
+          </div>
+
+          {/* 스킬 태그 리스트 */}
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            {skills.map((skill) => (
+              <span
+                key={skill}
+                className="px-2.5 py-1 rounded-lg bg-[#F2F4F6] text-[#4E5968] text-xs font-medium"
+              >
+                {skill}
+              </span>
+            ))}
+          </div>
+        </section>
+
+        {/* 링크 목록 섹션 (TDS ListRow 기반 카드) */}
+        <section className="bg-white rounded-3xl p-2 border border-[#E5E8EB] tds-shadow-sm flex flex-col">
+          <div className="px-4 py-3">
+            <h2 className="text-xs font-bold text-[#8B95A1] uppercase tracking-wider">
+              링크 모음
+            </h2>
+          </div>
+
+          <div className="flex flex-col">
+            {linkRows.map((item, index) => {
+              const Icon = item.icon;
+              return (
+                <a
+                  key={index}
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex items-center justify-between p-3.5 rounded-2xl hover:bg-[#F9FAFB] tds-pressable transition-all cursor-pointer"
+                >
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    <div className="w-11 h-11 rounded-2xl bg-[#F2F4F6] text-[#333D4B] group-hover:bg-[#E8F3FF] group-hover:text-[#3182F6] flex items-center justify-center shrink-0 transition-colors">
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <div className="flex flex-col min-w-0 text-left">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[15px] font-semibold text-[#191F28] group-hover:text-[#3182F6] transition-colors truncate">
+                          {item.title}
+                        </span>
+                        {item.badge && (
+                          <span className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-[#F2F4F6] text-[#6B7684]">
+                            {item.badge}
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-xs text-[#8B95A1] truncate mt-0.5">
+                        {item.subtitle}
+                      </span>
+                    </div>
+                  </div>
+
+                  <ChevronRight className="w-5 h-5 text-[#B0B8C1] group-hover:text-[#4E5968] group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
+                </a>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* 연락처 및 이메일 카드 */}
+        <section className="bg-white rounded-3xl p-5 border border-[#E5E8EB] tds-shadow-sm flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-[#E8F3FF] text-[#3182F6] flex items-center justify-center">
+                <Mail className="w-5 h-5" />
+              </div>
+              <div className="flex flex-col text-left">
+                <span className="text-xs font-semibold text-[#8B95A1]">
+                  이메일 문의
+                </span>
+                <span className="text-sm font-semibold text-[#191F28]">
+                  choieese.dev@gmail.com
+                </span>
+              </div>
+            </div>
+
             <button
               onClick={() => copyToClipboard("choieese.dev@gmail.com", "email")}
-              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium transition-all active:scale-95 shadow-lg shadow-indigo-600/30 cursor-pointer"
+              className="px-3 py-1.5 rounded-xl bg-[#F2F4F6] hover:bg-[#E5E8EB] text-[#333D4B] font-semibold text-xs tds-pressable transition-colors flex items-center gap-1 cursor-pointer"
             >
               {copiedType === "email" ? (
                 <>
-                  <Check className="w-3.5 h-3.5 text-emerald-300" />
-                  <span>복사 완료!</span>
+                  <Check className="w-3.5 h-3.5 text-[#3182F6]" />
+                  <span className="text-[#3182F6]">복사됨</span>
                 </>
               ) : (
                 <>
                   <Copy className="w-3.5 h-3.5" />
-                  <span>이메일 복사</span>
+                  <span>복사</span>
                 </>
               )}
             </button>
-            <a
-              href="mailto:choieese.dev@gmail.com"
-              className="inline-flex items-center justify-center p-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white border border-white/10 text-xs transition-all"
-              title="메일 앱 열기"
-            >
-              <ExternalLink className="w-3.5 h-3.5" />
-            </a>
           </div>
-        </div>
+        </section>
 
-        {/* 푸터 영역 */}
-        <footer className="w-full flex flex-col items-center gap-2 pt-2 text-center">
-          <div className="flex items-center gap-1 text-xs text-zinc-500">
-            <span>Crafted with passion</span>
-            <Heart className="w-3 h-3 text-rose-500 fill-rose-500 inline" />
-            <span>by 최혁진</span>
-          </div>
-          <p className="text-[11px] text-zinc-600 font-mono">
-            &copy; {new Date().getFullYear()} Hyukjin Choi. All rights reserved.
-          </p>
+        {/* 푸터 */}
+        <footer className="py-6 text-center text-xs text-[#B0B8C1] flex flex-col items-center gap-1">
+          <p>© {new Date().getFullYear()} 최혁진. All rights reserved.</p>
+          <p className="text-[11px] text-[#D1D6DB]">토스 디자인 시스템(TDS) 스타일로 제작되었어요</p>
         </footer>
 
-      </div>
+      </main>
 
-      {/* 하단 토스트 알림 피드백 */}
+      {/* TDS BottomCTA (화면 최하단 고정 Primary 액션 버튼) */}
+      <aside className="fixed bottom-0 left-0 right-0 z-40 flex justify-center px-4 pb-4 pt-3 bg-gradient-to-t from-[#F9FAFB] via-[#F9FAFB]/90 to-transparent pointer-events-none">
+        <div className="w-full max-w-[440px] pointer-events-auto">
+          <a
+            href="mailto:choieese.dev@gmail.com"
+            className="w-full h-14 rounded-2xl bg-[#3182F6] hover:bg-[#2B72D6] text-white font-bold text-[17px] flex items-center justify-center gap-2 shadow-sm tds-pressable cursor-pointer"
+          >
+            <Mail className="w-5 h-5" />
+            <span>이메일 보내기</span>
+          </a>
+        </div>
+      </aside>
+
+      {/* TDS Toast 피드백 (grey-900 surface + green-500 check) */}
       {copiedType && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full bg-zinc-900/90 border border-white/20 text-white text-xs font-medium shadow-2xl backdrop-blur-lg transition-all animate-bounce">
-          <Check className="w-4 h-4 text-emerald-400" />
+        <aside
+          role="status"
+          aria-live="polite"
+          className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2.5 px-5 py-3.5 rounded-2xl bg-[#191F28] text-white text-sm font-semibold tds-shadow-toast transition-all animate-in fade-in zoom-in-95 duration-150"
+        >
+          <div className="w-5 h-5 rounded-full bg-[#22C55E] text-white flex items-center justify-center shrink-0">
+            <Check className="w-3.5 h-3.5 stroke-[3]" />
+          </div>
           <span>
             {copiedType === "email"
-              ? "이메일 주소가 클립보드에 복사되었습니다."
-              : "프로필 링크가 클립보드에 복사되었습니다."}
+              ? "이메일 주소를 복사했어요"
+              : "프로필 링크를 복사했어요"}
           </span>
-        </div>
+        </aside>
       )}
-    </main>
+    </div>
   );
 }

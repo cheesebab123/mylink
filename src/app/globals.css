@@ -1,26 +1,55 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #F9FAFB;
+  --foreground: #191F28;
+  --toss-blue: #3182F6;
+  --toss-blue-light: #E8F3FF;
+  --toss-grey-900: #191F28;
+  --toss-grey-800: #333D4B;
+  --toss-grey-700: #4E5968;
+  --toss-grey-600: #6B7684;
+  --toss-grey-500: #8B95A1;
+  --toss-grey-400: #B0B8C1;
+  --toss-grey-300: #D1D6DB;
+  --toss-grey-200: #E5E8EB;
+  --toss-grey-100: #F2F4F6;
+  --toss-grey-50: #F9FAFB;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #F9FAFB;
+  color: #191F28;
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* TDS 부드러운 눌림 효과 (TDS Pressed Overlay) */
+.tds-pressable {
+  transition: background-color 150ms cubic-bezier(0.22, 0.61, 0.36, 1), transform 150ms cubic-bezier(0.22, 0.61, 0.36, 1), opacity 150ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.tds-pressable:active {
+  transform: scale(0.985);
+  opacity: 0.92;
+}
+
+/* TDS 그림자 */
+.tds-shadow-sm {
+  box-shadow: 0 1px 3px rgba(25, 31, 40, 0.04), 0 1px 2px rgba(25, 31, 40, 0.02);
+}
+
+.tds-shadow-md {
+  box-shadow: 0 4px 16px rgba(25, 31, 40, 0.06), 0 1px 3px rgba(25, 31, 40, 0.04);
+}
+
+.tds-shadow-toast {
+  box-shadow: 0 8px 24px rgba(25, 31, 40, 0.16);
 }
