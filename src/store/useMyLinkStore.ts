@@ -20,6 +20,41 @@ export const useMyLinkStore = create<MyLinkState>()(
           },
         })),
 
+      addLink: (newLinkData) =>
+        set((state) => {
+          const now = new Date().toISOString();
+          const newLink = {
+            ...newLinkData,
+            id: `link-${Date.now()}`,
+            clicks: 0,
+            isActive: newLinkData.isActive ?? true,
+            order: newLinkData.order ?? state.links.length + 1,
+            createdAt: now,
+            updatedAt: now,
+          };
+          return {
+            links: [...state.links, newLink],
+          };
+        }),
+
+      deleteLink: (id: string) =>
+        set((state) => ({
+          links: state.links.filter((link) => link.id !== id),
+        })),
+
+      toggleLinkActive: (id: string) =>
+        set((state) => ({
+          links: state.links.map((link) =>
+            link.id === id
+              ? {
+                  ...link,
+                  isActive: !link.isActive,
+                  updatedAt: new Date().toISOString(),
+                }
+              : link
+          ),
+        })),
+
       incrementClick: (id: string) =>
         set((state) => ({
           links: state.links.map((link) =>

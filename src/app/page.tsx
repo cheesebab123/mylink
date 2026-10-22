@@ -75,11 +75,12 @@ export default function Home() {
 
       {/* 모바일 셸 컨테이너 (최대 440px) */}
       <main className="w-full max-w-[440px] px-4 sm:px-6 pt-3 flex flex-col gap-4 relative z-10">
-        {/* TopBar (로고, 3종 테마 전환, 공유 버튼) */}
+        {/* TopBar (로고, 3종 테마 전환, 마이페이지 이동, 공유 버튼) */}
         <TopBar
           theme={currentTheme}
           onThemeChange={handleThemeChange}
           onShare={handleShare}
+          showMyPageBtn={true}
         />
 
         {/* 프로필 헤더 카드 */}

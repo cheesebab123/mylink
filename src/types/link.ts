@@ -13,5 +13,11 @@ export interface LinkItem {
   updatedAt: string;
 }
 
-export type CreateLinkInput = Omit<LinkItem, "id" | "clicks" | "createdAt" | "updatedAt">;
+export type CreateLinkInput = Omit<
+  LinkItem,
+  "id" | "clicks" | "createdAt" | "updatedAt" | "isActive" | "order"
+> & {
+  isActive?: boolean;
+  order?: number;
+};
 export type UpdateLinkInput = Partial<CreateLinkInput>;

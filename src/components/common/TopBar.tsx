@@ -3,20 +3,29 @@
 import React from "react";
 import { ThemeType } from "@/types";
 import { ThemeSwitcher } from "./ThemeSwitcher";
-import { Share2, Link2 } from "lucide-react";
+import Link from "next/link";
+import { Share2, Link2, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface TopBarProps {
   theme: ThemeType;
   onThemeChange: (theme: ThemeType) => void;
   onShare: () => void;
+  onAddLink?: () => void;
+  showMyPageBtn?: boolean;
 }
 
-export function TopBar({ theme, onThemeChange, onShare }: TopBarProps) {
+export function TopBar({
+  theme,
+  onThemeChange,
+  onShare,
+  onAddLink,
+  showMyPageBtn = true,
+}: TopBarProps) {
   return (
     <header className="h-14 flex items-center justify-between gap-2">
       {/* 로고 & 타이틀 */}
-      <div className="flex items-center gap-2">
+      <Link href="/" className="flex items-center gap-2 group cursor-pointer">
         <div
           className={cn(
             "w-8 h-8 flex items-center justify-center font-bold text-sm transition-all",
@@ -39,11 +48,56 @@ export function TopBar({ theme, onThemeChange, onShare }: TopBarProps) {
         >
           myLink
         </span>
-      </div>
+      </Link>
 
-      {/* 테마 스위처 & 공유 버튼 */}
-      <div className="flex items-center gap-2">
+      {/* 테마 스위처 & 마이페이지/링크 추가 & 공유 버튼 */}
+      <div className="flex items-center gap-1.5 sm:gap-2">
         <ThemeSwitcher currentTheme={theme} onThemeChange={onThemeChange} />
+
+        {showMyPageBtn && (
+          <Link
+            href="/mypage"
+            aria-label="마이페이지로 이동"
+            title="마이페이지 (링크 관리)"
+            className={cn(
+              "w-9 h-9 flex items-center justify-center transition-all cursor-pointer font-bold text-sm",
+              // Toss
+              theme === "toss" &&
+                "rounded-full bg-[#E8F3FF] text-[#3182F6] hover:bg-[#D4E8FF] tds-pressable",
+              // Neobrutalism
+              theme === "neobrutalism" &&
+                "rounded-lg border-2 border-black bg-[#FEF08A] text-black shadow-[2px_2px_0px_#000] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[1px_1px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none",
+              // Glass
+              theme === "glass" &&
+                "rounded-xl bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 hover:text-white hover:bg-cyan-500/30 shadow-[0_0_10px_rgba(6,182,212,0.3)] backdrop-blur-md"
+            )}
+          >
+            <User className="w-4 h-4" />
+          </Link>
+        )}
+
+        {onAddLink && (
+          <button
+            type="button"
+            onClick={onAddLink}
+            aria-label="새 링크 추가하기"
+            title="새 링크 추가하기"
+            className={cn(
+              "w-9 h-9 flex items-center justify-center transition-all cursor-pointer font-bold text-sm",
+              // Toss
+              theme === "toss" &&
+                "rounded-full bg-[#E8F3FF] text-[#3182F6] hover:bg-[#D4E8FF] tds-pressable",
+              // Neobrutalism
+              theme === "neobrutalism" &&
+                "rounded-lg border-2 border-black bg-[#FEF08A] text-black shadow-[2px_2px_0px_#000] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[1px_1px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none font-black",
+              // Glass
+              theme === "glass" &&
+                "rounded-xl bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 hover:text-white hover:bg-cyan-500/30 shadow-[0_0_10px_rgba(6,182,212,0.3)] backdrop-blur-md"
+            )}
+          >
+            +
+          </button>
+        )}
 
         <button
           type="button"

@@ -43,6 +43,8 @@ export async function getLinks(): Promise<LinkItem[]> {
 
 export async function createLink(input: CreateLinkInput): Promise<LinkItem> {
   const newLink: LinkItem = {
+    isActive: true,
+    order: INITIAL_LINKS.length + 1,
     ...input,
     id: Math.random().toString(36).substring(2, 9),
     clicks: 0,
