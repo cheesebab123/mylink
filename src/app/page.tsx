@@ -177,7 +177,8 @@ export default function Home() {
   }
 
   // 4. 로그인 완료 상태 또는 공유 프로필 조회 상태 → 마이링크 메인 화면 표시
-  const isOwnerView = !sharedUsername || (!!user && user.uid === sharedUid);
+  // 공유 링크(?u=...)로 접속한 경우에는 로그인한 본인이라도 순수 열람 화면으로 표시
+  const isOwnerView = !sharedUsername;
 
   return (
     <div
