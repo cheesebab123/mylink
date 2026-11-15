@@ -18,7 +18,7 @@ interface AddLinkDialogProps {
     description?: string;
     icon?: string;
     badge?: string;
-  }) => void;
+  }) => void | Promise<void>;
   theme: ThemeType;
 }
 
@@ -84,7 +84,7 @@ export function AddLinkDialog({
     onClose();
   };
 
-  const onSubmit = (data: AddLinkFormValues) => {
+  const onSubmit = async (data: AddLinkFormValues) => {
     let formattedUrl = data.url.trim();
     if (
       !formattedUrl.startsWith("http://") &&
@@ -94,15 +94,18 @@ export function AddLinkDialog({
       formattedUrl = `https://${formattedUrl}`;
     }
 
-    onAddLink({
-      title: data.title.trim(),
-      url: formattedUrl,
-      description: data.description?.trim() || undefined,
-      icon: data.icon || "Globe",
-      badge: data.badge?.trim() || undefined,
-    });
-
-    handleClose();
+    try {
+      await onAddLink({
+        title: data.title.trim(),
+        url: formattedUrl,
+        description: data.description?.trim() || undefined,
+        icon: data.icon || "Globe",
+        badge: data.badge?.trim() || undefined,
+      });
+      handleClose();
+    } catch (error) {
+      console.error("Error adding link:", error);
+    }
   };
 
   // Helper styles based on theme

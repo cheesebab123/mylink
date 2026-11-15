@@ -14,9 +14,7 @@ interface LinkListProps {
 }
 
 export function LinkList({ links, theme, onLinkClick, onAddLink }: LinkListProps) {
-  const activeLinks = links
-    .filter((link) => link.isActive !== false)
-    .sort((a, b) => a.order - b.order);
+  const activeLinks = links.filter((link) => link.isActive !== false);
 
   if (activeLinks.length === 0) {
     return (

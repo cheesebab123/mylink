@@ -15,11 +15,21 @@ export default function Home() {
   const [mounted, setMounted] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  const { theme, profile, links, setTheme, incrementClick } = useMyLinkStore();
+  const {
+    theme,
+    profile,
+    links,
+    setTheme,
+    incrementClick,
+    fetchLinks,
+    fetchProfile,
+  } = useMyLinkStore();
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    fetchProfile();
+    fetchLinks();
+  }, [fetchProfile, fetchLinks]);
 
   const showToast = (message: string) => {
     setToastMessage(message);

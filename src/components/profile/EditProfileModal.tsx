@@ -1,0 +1,500 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { editProfileSchema, EditProfileFormValues } from "@/lib/validations/profile";
+import { ProfileData, ThemeType } from "@/types";
+import { cn } from "@/lib/utils";
+import { X, Plus, Loader2, Sparkles, User, Mail, Tag } from "lucide-react";
+
+interface EditProfileModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  profile: ProfileData;
+  theme: ThemeType;
+  onSave: (updatedProfile: ProfileData) => Promise<void> | void;
+}
+
+export function EditProfileModal({
+  isOpen,
+  onClose,
+  profile,
+  theme,
+  onSave,
+}: EditProfileModalProps) {
+  const [skills, setSkills] = useState<string[]>(profile.skills || []);
+  const [skillInput, setSkillInput] = useState("");
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<EditProfileFormValues>({
+    resolver: zodResolver(editProfileSchema),
+    defaultValues: {
+      name: profile.name,
+      handle: profile.handle,
+      avatarText: profile.avatarText || "",
+      role: profile.role || "",
+      bio: profile.bio || "",
+      email: profile.email || "",
+      statusBadge: profile.statusBadge || "",
+      isStatusOn: profile.isStatusOn ?? true,
+    },
+  });
+
+  // profile이 변경되었을 때 폼 초기화
+  useEffect(() => {
+    if (isOpen) {
+      reset({
+        name: profile.name,
+        handle: profile.handle,
+        avatarText: profile.avatarText || "",
+        role: profile.role || "",
+        bio: profile.bio || "",
+        email: profile.email || "",
+        statusBadge: profile.statusBadge || "",
+        isStatusOn: profile.isStatusOn ?? true,
+      });
+      setSkills(profile.skills || []);
+      setSkillInput("");
+    }
+  }, [isOpen, profile, reset]);
+
+  // 스크롤 락
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  const handleAddSkill = () => {
+    const trimmed = skillInput.trim();
+    if (!trimmed) return;
+    if (skills.includes(trimmed)) {
+      setSkillInput("");
+      return;
+    }
+    setSkills([...skills, trimmed]);
+    setSkillInput("");
+  };
+
+  const handleRemoveSkill = (skillToRemove: string) => {
+    setSkills(skills.filter((s) => s !== skillToRemove));
+  };
+
+  const handleSkillKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleAddSkill();
+    }
+  };
+
+  const onSubmit = async (data: EditProfileFormValues) => {
+    const updatedName = data.name.trim();
+    const updatedHandle = data.handle.trim();
+    const updatedAvatarText = data.avatarText?.trim() || updatedName.charAt(0) || "최";
+    const updatedRole = data.role?.trim() || "";
+    const updatedBio = data.bio?.trim() || "";
+    const updatedEmail = data.email.trim();
+    const updatedStatusBadge = data.statusBadge?.trim() || "";
+    const updatedIsStatusOn = data.isStatusOn ?? true;
+
+    // 변경사항 dirty check
+    const isUnchanged =
+      updatedName === profile.name &&
+      updatedHandle === profile.handle &&
+      updatedAvatarText === (profile.avatarText || "") &&
+      updatedRole === (profile.role || "") &&
+      updatedBio === (profile.bio || "") &&
+      updatedEmail === (profile.email || "") &&
+      updatedStatusBadge === (profile.statusBadge || "") &&
+      updatedIsStatusOn === (profile.isStatusOn ?? true) &&
+      JSON.stringify(skills) === JSON.stringify(profile.skills || []);
+
+    if (isUnchanged) {
+      onClose();
+      return;
+    }
+
+    const newProfile: ProfileData = {
+      ...profile,
+      name: updatedName,
+      handle: updatedHandle,
+      avatarText: updatedAvatarText,
+      role: updatedRole,
+      bio: updatedBio,
+      email: updatedEmail,
+      statusBadge: updatedStatusBadge,
+      isStatusOn: updatedIsStatusOn,
+      skills,
+    };
+
+    try {
+      await onSave(newProfile);
+      onClose();
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+    }
+  };
+
+  const getInputStyles = (hasError?: boolean) => {
+    if (theme === "toss") {
+      return cn(
+        "w-full h-11 px-3.5 rounded-xl text-sm transition-all outline-none",
+        "bg-[#F2F4F6] text-[#191F28] placeholder:text-[#8B95A1] border border-transparent",
+        "focus:bg-white focus:border-[#3182F6]",
+        hasError && "border-[#F04452] bg-red-50/50 focus:border-[#F04452]"
+      );
+    }
+    if (theme === "neobrutalism") {
+      return cn(
+        "w-full h-11 px-3.5 rounded-lg text-sm font-bold transition-all outline-none",
+        "bg-white text-black placeholder:text-zinc-400 border-2 border-black shadow-[2px_2px_0px_#000]",
+        "focus:bg-[#FEF08A] focus:shadow-[3px_3px_0px_#000]",
+        hasError && "border-red-600 bg-red-50"
+      );
+    }
+    return cn(
+      "w-full h-11 px-3.5 rounded-xl text-sm transition-all outline-none",
+      "bg-white/10 text-white placeholder:text-slate-400 border border-white/20 backdrop-blur-md",
+      "focus:bg-white/15 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50",
+      hasError && "border-red-400 bg-red-950/20"
+    );
+  };
+
+  const getLabelStyles = () => {
+    if (theme === "toss") return "text-xs font-semibold text-[#4E5968]";
+    if (theme === "neobrutalism") return "text-xs font-black text-black";
+    return "text-xs font-medium text-slate-300";
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* 백드롭 오버레이 */}
+      <div
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity animate-in fade-in duration-200"
+        onClick={onClose}
+      />
+
+      {/* 모달 윈도우 */}
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-edit-profile-title"
+        className={cn(
+          "relative w-full max-w-lg max-h-[90vh] flex flex-col rounded-3xl z-10 overflow-hidden shadow-2xl transition-all animate-in zoom-in-95 duration-200",
+          theme === "toss" && "bg-white border border-[#E5E8EB]",
+          theme === "neobrutalism" &&
+            "bg-white border-3 border-black shadow-[6px_6px_0px_#000] rounded-2xl",
+          theme === "glass" &&
+            "bg-[#131926]/95 border border-white/15 text-white backdrop-blur-2xl shadow-[0_8px_32px_0_rgba(0,0,0,0.5)]"
+        )}
+      >
+        {/* 모달 헤더 */}
+        <div
+          className={cn(
+            "flex items-center justify-between px-6 py-4 border-b shrink-0",
+            theme === "toss" && "border-[#F2F4F6]",
+            theme === "neobrutalism" && "border-b-2 border-black bg-[#FEF08A]",
+            theme === "glass" && "border-white/10"
+          )}
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-lg">👤</span>
+            <h2
+              id="modal-edit-profile-title"
+              className={cn(
+                "font-bold text-base",
+                theme === "toss" && "text-[#191F28]",
+                theme === "neobrutalism" && "text-black font-black text-lg",
+                theme === "glass" && "text-white"
+              )}
+            >
+              프로필 정보 수정
+            </h2>
+          </div>
+
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="모달 닫기"
+            className={cn(
+              "w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer",
+              theme === "toss" &&
+                "text-[#8B95A1] hover:bg-[#F2F4F6] hover:text-[#191F28]",
+              theme === "neobrutalism" &&
+                "border-2 border-black bg-white text-black hover:bg-yellow-200 shadow-[1px_1px_0px_#000]",
+              theme === "glass" && "text-slate-400 hover:text-white hover:bg-white/10"
+            )}
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* 모달 스크롤 폼 본문 */}
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex flex-col flex-1 overflow-hidden"
+          noValidate
+        >
+          <div className="p-6 overflow-y-auto space-y-4 max-h-[calc(90vh-140px)]">
+            {/* 이름 & 아바타 텍스트 */}
+            <div className="grid grid-cols-3 gap-3">
+              <div className="col-span-2 space-y-1.5">
+                <label className={getLabelStyles()}>
+                  이름 <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="예: 최혁진"
+                  {...register("name")}
+                  className={getInputStyles(!!errors.name)}
+                />
+                {errors.name && (
+                  <p className="text-xs text-red-500 font-medium">
+                    {errors.name.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-1.5">
+                <label className={getLabelStyles()}>아바타 글자</label>
+                <input
+                  type="text"
+                  maxLength={4}
+                  placeholder="예: 최"
+                  {...register("avatarText")}
+                  className={getInputStyles(!!errors.avatarText)}
+                />
+                {errors.avatarText && (
+                  <p className="text-xs text-red-500 font-medium">
+                    {errors.avatarText.message}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* 직무/역할 & 핸들 */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className={getLabelStyles()}>직무 / 역할</label>
+                <input
+                  type="text"
+                  placeholder="예: 프론트엔드 개발자"
+                  {...register("role")}
+                  className={getInputStyles(!!errors.role)}
+                />
+                {errors.role && (
+                  <p className="text-xs text-red-500 font-medium">
+                    {errors.role.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-1.5">
+                <label className={getLabelStyles()}>
+                  핸들 (@) <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="예: @cheesebab123"
+                  {...register("handle")}
+                  className={getInputStyles(!!errors.handle)}
+                />
+                {errors.handle && (
+                  <p className="text-xs text-red-500 font-medium">
+                    {errors.handle.message}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* 이메일 주소 (이메일 문의 카드 연동) */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className={getLabelStyles()}>
+                  이메일 주소 (문의 카드 연동) <span className="text-red-500">*</span>
+                </label>
+              </div>
+              <input
+                type="email"
+                placeholder="예: choieese.dev@gmail.com"
+                {...register("email")}
+                className={getInputStyles(!!errors.email)}
+              />
+              {errors.email && (
+                <p className="text-xs text-red-500 font-medium">
+                  {errors.email.message}
+                </p>
+              )}
+            </div>
+
+            {/* 자기소개 (Bio) */}
+            <div className="space-y-1.5">
+              <label className={getLabelStyles()}>자기소개</label>
+              <textarea
+                rows={3}
+                placeholder="자신을 소개하는 문구를 작성해주세요."
+                {...register("bio")}
+                className={cn(
+                  getInputStyles(!!errors.bio),
+                  "h-auto py-2.5 resize-none leading-relaxed"
+                )}
+              />
+              {errors.bio && (
+                <p className="text-xs text-red-500 font-medium">
+                  {errors.bio.message}
+                </p>
+              )}
+            </div>
+
+            {/* 상태 뱃지 및 토글 */}
+            <div className="space-y-2 p-3.5 rounded-2xl border border-black/5 dark:border-white/10 bg-black/[0.02] dark:bg-white/[0.02]">
+              <div className="flex items-center justify-between">
+                <label className={cn(getLabelStyles(), "flex items-center gap-1.5")}>
+                  <Sparkles className="w-3.5 h-3.5 text-yellow-500" />
+                  <span>상태 뱃지 (프로젝트 제안/구직 등)</span>
+                </label>
+                <label className="flex items-center gap-1.5 cursor-pointer text-xs font-semibold">
+                  <input
+                    type="checkbox"
+                    {...register("isStatusOn")}
+                    className="w-4 h-4 rounded text-[#3182F6] focus:ring-0 cursor-pointer accent-[#3182F6]"
+                  />
+                  <span>표시하기</span>
+                </label>
+              </div>
+              <input
+                type="text"
+                placeholder="예: 새로운 프로젝트 제안을 환영해요"
+                {...register("statusBadge")}
+                className={getInputStyles(!!errors.statusBadge)}
+              />
+            </div>
+
+            {/* 스킬 태그 목록 관리 */}
+            <div className="space-y-2">
+              <label className={getLabelStyles()}>스킬 태그</label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={skillInput}
+                  onChange={(e) => setSkillInput(e.target.value)}
+                  onKeyDown={handleSkillKeyDown}
+                  placeholder="예: React, TypeScript (입력 후 Enter)"
+                  className={getInputStyles()}
+                />
+                <button
+                  type="button"
+                  onClick={handleAddSkill}
+                  className={cn(
+                    "px-4 h-11 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer flex items-center gap-1",
+                    theme === "toss" &&
+                      "bg-[#E8F3FF] text-[#3182F6] hover:bg-[#D4E8FF]",
+                    theme === "neobrutalism" &&
+                      "bg-white text-black border-2 border-black font-black shadow-[2px_2px_0px_#000] hover:bg-yellow-200",
+                    theme === "glass" &&
+                      "bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 hover:bg-cyan-500/30"
+                  )}
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>추가</span>
+                </button>
+              </div>
+
+              {/* 태그 리스트 */}
+              {skills.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {skills.map((skill) => (
+                    <span
+                      key={skill}
+                      className={cn(
+                        "inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium transition-all",
+                        theme === "toss" && "bg-[#F2F4F6] text-[#4E5968]",
+                        theme === "neobrutalism" &&
+                          "bg-white border-2 border-black text-black font-bold shadow-[2px_2px_0px_#000]",
+                        theme === "glass" &&
+                          "bg-white/10 text-slate-200 border border-white/15 backdrop-blur-sm"
+                      )}
+                    >
+                      <span>{skill}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveSkill(skill)}
+                        className="hover:opacity-75 cursor-pointer ml-0.5"
+                        aria-label={`${skill} 삭제`}
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 모달 하단 액션 버튼 */}
+          <div
+            className={cn(
+              "px-6 py-4 border-t flex items-center justify-end gap-2.5 shrink-0",
+              theme === "toss" && "border-[#F2F4F6] bg-white",
+              theme === "neobrutalism" && "border-t-2 border-black bg-white",
+              theme === "glass" && "border-white/10 bg-[#131926]"
+            )}
+          >
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={isSubmitting}
+              className={cn(
+                "px-4 h-11 rounded-xl text-sm font-semibold transition-all cursor-pointer",
+                theme === "toss" &&
+                  "bg-[#F2F4F6] text-[#4E5968] hover:bg-[#E5E8EB]",
+                theme === "neobrutalism" &&
+                  "bg-white text-black border-2 border-black font-black shadow-[2px_2px_0px_#000] hover:bg-zinc-100",
+                theme === "glass" &&
+                  "bg-white/10 text-slate-300 hover:bg-white/15"
+              )}
+            >
+              취소
+            </button>
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className={cn(
+                "px-5 h-11 rounded-xl text-sm font-bold flex items-center gap-2 transition-all cursor-pointer shadow-sm",
+                theme === "toss" &&
+                  "bg-[#3182F6] text-white hover:bg-[#2B72D6] tds-pressable",
+                theme === "neobrutalism" &&
+                  "bg-[#A7F3D0] text-black border-2 border-black font-black shadow-[3px_3px_0px_#000] hover:bg-[#86efac] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0px_#000]",
+                theme === "glass" &&
+                  "bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:brightness-110 shadow-[0_0_15px_rgba(6,182,212,0.4)]"
+              )}
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>저장 중...</span>
+                </>
+              ) : (
+                <span>저장하기</span>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
