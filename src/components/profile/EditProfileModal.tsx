@@ -1,12 +1,48 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { editProfileSchema, EditProfileFormValues } from "@/lib/validations/profile";
+import { checkUsernameAvailable, UsernameTakenError } from "@/services/profileService";
+import { useMyLinkStore } from "@/store/useMyLinkStore";
 import { ProfileData, ThemeType } from "@/types";
+import { ProfileAvatar } from "./ProfileAvatar";
 import { cn } from "@/lib/utils";
-import { X, Plus, Loader2, Sparkles, User, Mail, Tag } from "lucide-react";
+import { X, Plus, Loader2, Sparkles, User, Mail, Tag, Camera, Trash2 } from "lucide-react";
+
+const CHARACTER_AVATARS = ["👨‍💻", "👩‍💻", "🦊", "🐱", "🐶", "🐼", "🤖", "🚀", "🦄", "🐻"];
+
+/**
+ * 업로드된 이미지를 256x256 정사각형 JPEG Data URL로 리사이즈 및 압축
+ */
+function resizeImageToDataUrl(file: File, maxSize = 256): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("이미지를 읽지 못했습니다."));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error("올바른 이미지 파일이 아닙니다."));
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = maxSize;
+        canvas.height = maxSize;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          reject(new Error("캔버스를 초기화할 수 없습니다."));
+          return;
+        }
+        const minSide = Math.min(img.width, img.height);
+        const sx = (img.width - minSide) / 2;
+        const sy = (img.height - minSide) / 2;
+        ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, maxSize, maxSize);
+        resolve(canvas.toDataURL("image/jpeg", 0.82));
+      };
+      img.src = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+  });
+}
 
 interface EditProfileModalProps {
   isOpen: boolean;
@@ -25,17 +61,27 @@ export function EditProfileModal({
 }: EditProfileModalProps) {
   const [skills, setSkills] = useState<string[]>(profile.skills || []);
   const [skillInput, setSkillInput] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState<string>(profile.avatarUrl || "");
+  const [photoError, setPhotoError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const currentUser = useMyLinkStore((state) => state.user);
+
+  const defaultUsername =
+    profile.username || profile.handle?.replace(/^@/, "").toLowerCase() || "";
 
   const {
     register,
     handleSubmit,
     reset,
     watch,
+    setValue,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<EditProfileFormValues>({
     resolver: zodResolver(editProfileSchema),
     defaultValues: {
-      name: profile.name,
+      username: defaultUsername,
+      name: profile.displayName || profile.name,
       handle: profile.handle,
       avatarText: profile.avatarText || "",
       role: profile.role || "",
@@ -49,8 +95,11 @@ export function EditProfileModal({
   // profile이 변경되었을 때 폼 초기화
   useEffect(() => {
     if (isOpen) {
+      const nextUsername =
+        profile.username || profile.handle?.replace(/^@/, "").toLowerCase() || "";
       reset({
-        name: profile.name,
+        username: nextUsername,
+        name: profile.displayName || profile.name,
         handle: profile.handle,
         avatarText: profile.avatarText || "",
         role: profile.role || "",
@@ -61,6 +110,8 @@ export function EditProfileModal({
       });
       setSkills(profile.skills || []);
       setSkillInput("");
+      setAvatarUrl(profile.avatarUrl || "");
+      setPhotoError(null);
     }
   }, [isOpen, profile, reset]);
 
@@ -100,7 +151,35 @@ export function EditProfileModal({
     }
   };
 
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPhotoError(null);
+
+    if (!file.type.startsWith("image/")) {
+      setPhotoError("이미지 파일만 업로드할 수 있습니다.");
+      return;
+    }
+
+    try {
+      const compressedDataUrl = await resizeImageToDataUrl(file, 256);
+      setAvatarUrl(compressedDataUrl);
+    } catch (error) {
+      console.error("Failed to process profile image:", error);
+      setPhotoError("이미지를 처리하는 중 오류가 발생했습니다.");
+    } finally {
+      e.target.value = "";
+    }
+  };
+
+  const handleSelectCharacter = (emoji: string) => {
+    setAvatarUrl("");
+    setPhotoError(null);
+    setValue("avatarText", emoji, { shouldDirty: true });
+  };
+
   const onSubmit = async (data: EditProfileFormValues) => {
+    const updatedUsername = data.username.trim().toLowerCase();
     const updatedName = data.name.trim();
     const updatedHandle = data.handle.trim();
     const updatedAvatarText = data.avatarText?.trim() || updatedName.charAt(0) || "최";
@@ -112,9 +191,11 @@ export function EditProfileModal({
 
     // 변경사항 dirty check
     const isUnchanged =
-      updatedName === profile.name &&
+      updatedUsername === (profile.username || "") &&
+      updatedName === (profile.displayName || profile.name) &&
       updatedHandle === profile.handle &&
       updatedAvatarText === (profile.avatarText || "") &&
+      avatarUrl === (profile.avatarUrl || "") &&
       updatedRole === (profile.role || "") &&
       updatedBio === (profile.bio || "") &&
       updatedEmail === (profile.email || "") &&
@@ -127,11 +208,29 @@ export function EditProfileModal({
       return;
     }
 
+    // 저장 전 username 중복 체크
+    const userId = currentUser?.uid || "anonymous";
+    try {
+      const isAvailable = await checkUsernameAvailable(updatedUsername, userId);
+      if (!isAvailable) {
+        setError("username", {
+          type: "manual",
+          message: "이미 사용 중인 username입니다. 다른 이름을 입력해주세요.",
+        });
+        return;
+      }
+    } catch (error) {
+      console.error("Failed to check username availability:", error);
+    }
+
     const newProfile: ProfileData = {
       ...profile,
+      username: updatedUsername,
+      displayName: updatedName,
       name: updatedName,
       handle: updatedHandle,
       avatarText: updatedAvatarText,
+      avatarUrl,
       role: updatedRole,
       bio: updatedBio,
       email: updatedEmail,
@@ -144,6 +243,13 @@ export function EditProfileModal({
       await onSave(newProfile);
       onClose();
     } catch (error) {
+      if (error instanceof UsernameTakenError) {
+        setError("username", {
+          type: "manual",
+          message: "이미 사용 중인 username입니다. 다른 이름을 입력해주세요.",
+        });
+        return;
+      }
       console.error("Failed to update profile:", error);
     }
   };
@@ -249,11 +355,142 @@ export function EditProfileModal({
           noValidate
         >
           <div className="p-6 overflow-y-auto space-y-4 max-h-[calc(90vh-140px)]">
-            {/* 이름 & 아바타 텍스트 */}
+            {/* 프로필 사진 또는 캐릭터 아이콘 선택 */}
+            <div
+              className={cn(
+                "p-4 rounded-2xl border space-y-3",
+                theme === "toss" && "bg-[#F9FAFB] border-[#E5E8EB]",
+                theme === "neobrutalism" && "bg-[#FEF08A]/40 border-2 border-black",
+                theme === "glass" && "bg-white/[0.04] border-white/15"
+              )}
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <ProfileAvatar
+                    avatarUrl={avatarUrl}
+                    avatarText={watch("avatarText")}
+                    name={watch("name") || profile.name}
+                    theme={theme}
+                    size="xl"
+                  />
+                  <div className="flex flex-col gap-1">
+                    <span className={getLabelStyles()}>프로필 사진 / 캐릭터</span>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handlePhotoUpload}
+                        className="hidden"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className={cn(
+                          "h-8 px-3 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer",
+                          theme === "toss" &&
+                            "bg-[#3182F6] text-white hover:bg-[#1B64DA] tds-pressable",
+                          theme === "neobrutalism" &&
+                            "bg-[#BAE6FD] text-black border-2 border-black shadow-[2px_2px_0px_#000] font-black",
+                          theme === "glass" &&
+                            "bg-cyan-500/20 border border-cyan-400/40 text-cyan-200 hover:bg-cyan-500/30"
+                        )}
+                      >
+                        <Camera className="w-3.5 h-3.5" />
+                        <span>사진 업로드</span>
+                      </button>
+
+                      {avatarUrl && (
+                        <button
+                          type="button"
+                          onClick={() => setAvatarUrl("")}
+                          className={cn(
+                            "h-8 px-2.5 rounded-xl text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer",
+                            theme === "toss" &&
+                              "bg-[#F2F4F6] text-[#4E5968] hover:bg-[#E5E8EB]",
+                            theme === "neobrutalism" &&
+                              "bg-white text-black border-2 border-black shadow-[2px_2px_0px_#000] font-bold",
+                            theme === "glass" &&
+                              "bg-white/10 text-slate-300 hover:bg-white/20"
+                          )}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span>사진 제거</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {photoError && (
+                <p className="text-xs text-red-500 font-medium">{photoError}</p>
+              )}
+
+              {/* 캐릭터 아이콘 선택 */}
+              <div className="space-y-1.5">
+                <span className={cn("block text-[11px]", theme === "glass" ? "text-slate-400" : "text-[#6B7684]")}>
+                  또는 캐릭터 아이콘 선택:
+                </span>
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  {CHARACTER_AVATARS.map((emoji) => {
+                    const isSelected = !avatarUrl && watch("avatarText") === emoji;
+                    return (
+                      <button
+                        key={emoji}
+                        type="button"
+                        onClick={() => handleSelectCharacter(emoji)}
+                        className={cn(
+                          "w-9 h-9 rounded-xl text-lg flex items-center justify-center transition-all cursor-pointer",
+                          theme === "toss" &&
+                            (isSelected
+                              ? "bg-[#E8F3FF] ring-2 ring-[#3182F6]"
+                              : "bg-white border border-[#E5E8EB] hover:bg-[#F2F4F6]"),
+                          theme === "neobrutalism" &&
+                            (isSelected
+                              ? "bg-[#FEF08A] border-2 border-black shadow-[2px_2px_0px_#000]"
+                              : "bg-white border-2 border-black hover:bg-zinc-100"),
+                          theme === "glass" &&
+                            (isSelected
+                              ? "bg-cyan-500/30 border border-cyan-400 ring-1 ring-cyan-400"
+                              : "bg-white/5 border border-white/10 hover:bg-white/15")
+                        )}
+                      >
+                        {emoji}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* 공유 URL용 username */}
+            <div className="space-y-1.5">
+              <label className={getLabelStyles()}>
+                사용자 ID (username · 공유 URL용) <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                placeholder="예: honggildong"
+                {...register("username")}
+                className={getInputStyles(!!errors.username)}
+              />
+              {errors.username ? (
+                <p className="text-xs text-red-500 font-medium">
+                  {errors.username.message}
+                </p>
+              ) : (
+                <p className="text-[11px] text-[#8B95A1]">
+                  영문 소문자, 숫자, -, _만 가능하며 저장 전 중복 여부를 확인합니다.
+                </p>
+              )}
+            </div>
+
+            {/* 표시 이름(displayName) & 아바타 텍스트 */}
             <div className="grid grid-cols-3 gap-3">
               <div className="col-span-2 space-y-1.5">
                 <label className={getLabelStyles()}>
-                  이름 <span className="text-red-500">*</span>
+                  표시 이름 (displayName) <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"

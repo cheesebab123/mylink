@@ -12,13 +12,22 @@ import {
 import { db } from "@/lib/firebase";
 import { LinkItem, CreateLinkInput, UpdateLinkInput } from "@/types";
 
-const LINKS_COLLECTION_PATH = "users/anonymous/links";
+const DEFAULT_USER_ID = "anonymous";
 
 /**
- * users/anonymous/links Firestore 컬렉션 참조 반환
+ * users/{userId}/links Firestore 컬렉션 참조 반환
  */
-function getLinksCollectionRef() {
-  return collection(db, "users", "anonymous", "links");
+function getLinksCollectionRef(userId: string = DEFAULT_USER_ID) {
+  const safeUserId = userId || DEFAULT_USER_ID;
+  return collection(db, "users", safeUserId, "links");
+}
+
+/**
+ * users/{userId}/links/{linkId} Firestore 문서 참조 반환
+ */
+function getLinkDocRef(id: string, userId: string = DEFAULT_USER_ID) {
+  const safeUserId = userId || DEFAULT_USER_ID;
+  return doc(db, "users", safeUserId, "links", id);
 }
 
 /**
@@ -35,11 +44,14 @@ function cleanUndefinedFields<T extends Record<string, any>>(obj: T): Partial<T>
 }
 
 /**
- * Firestore users/anonymous/links에 새 링크 추가
+ * Firestore users/{userId}/links에 새 링크 추가
  */
-export async function createLink(input: CreateLinkInput): Promise<LinkItem> {
+export async function createLink(
+  input: CreateLinkInput,
+  userId: string = DEFAULT_USER_ID
+): Promise<LinkItem> {
   const now = new Date().toISOString();
-  const colRef = getLinksCollectionRef();
+  const colRef = getLinksCollectionRef(userId);
 
   const linkData = cleanUndefinedFields({
     title: input.title.trim(),
@@ -74,11 +86,11 @@ export async function createLink(input: CreateLinkInput): Promise<LinkItem> {
 }
 
 /**
- * Firestore users/anonymous/links에서 모든 링크 조회 (getDocs 사용, createdAt 최신순 정렬)
+ * Firestore users/{userId}/links에서 모든 링크 조회 (getDocs 사용, createdAt 최신순 정렬)
  */
-export async function getLinks(): Promise<LinkItem[]> {
+export async function getLinks(userId: string = DEFAULT_USER_ID): Promise<LinkItem[]> {
   try {
-    const colRef = getLinksCollectionRef();
+    const colRef = getLinksCollectionRef(userId);
     const q = query(colRef, orderBy("createdAt", "desc"));
     const snapshot = await getDocs(q);
 
@@ -108,8 +120,12 @@ export async function getLinks(): Promise<LinkItem[]> {
 /**
  * Firestore 링크 수정
  */
-export async function updateLink(id: string, input: UpdateLinkInput): Promise<void> {
-  const docRef = doc(db, LINKS_COLLECTION_PATH, id);
+export async function updateLink(
+  id: string,
+  input: UpdateLinkInput,
+  userId: string = DEFAULT_USER_ID
+): Promise<void> {
+  const docRef = getLinkDocRef(id, userId);
   const updateData = cleanUndefinedFields({
     ...input,
     updatedAt: new Date().toISOString(),
@@ -120,8 +136,12 @@ export async function updateLink(id: string, input: UpdateLinkInput): Promise<vo
 /**
  * Firestore 링크 활성/비활성 토글
  */
-export async function toggleLinkActive(id: string, currentActive: boolean): Promise<void> {
-  const docRef = doc(db, LINKS_COLLECTION_PATH, id);
+export async function toggleLinkActive(
+  id: string,
+  currentActive: boolean,
+  userId: string = DEFAULT_USER_ID
+): Promise<void> {
+  const docRef = getLinkDocRef(id, userId);
   await updateDoc(docRef, {
     isActive: !currentActive,
     updatedAt: new Date().toISOString(),
@@ -131,16 +151,22 @@ export async function toggleLinkActive(id: string, currentActive: boolean): Prom
 /**
  * Firestore 링크 삭제
  */
-export async function deleteLink(id: string): Promise<void> {
-  const docRef = doc(db, LINKS_COLLECTION_PATH, id);
+export async function deleteLink(
+  id: string,
+  userId: string = DEFAULT_USER_ID
+): Promise<void> {
+  const docRef = getLinkDocRef(id, userId);
   await deleteDoc(docRef);
 }
 
 /**
  * Firestore 링크 클릭수 증가
  */
-export async function incrementClick(id: string): Promise<void> {
-  const docRef = doc(db, LINKS_COLLECTION_PATH, id);
+export async function incrementClick(
+  id: string,
+  userId: string = DEFAULT_USER_ID
+): Promise<void> {
+  const docRef = getLinkDocRef(id, userId);
   await updateDoc(docRef, {
     clicks: increment(1),
     updatedAt: new Date().toISOString(),

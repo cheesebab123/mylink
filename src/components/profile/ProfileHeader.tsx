@@ -2,6 +2,7 @@
 
 import React from "react";
 import { ProfileData, ThemeType } from "@/types";
+import { ProfileAvatar } from "./ProfileAvatar";
 import { cn } from "@/lib/utils";
 import { Sparkles } from "lucide-react";
 
@@ -29,19 +30,13 @@ export function ProfileHeader({ profile, theme }: ProfileHeaderProps) {
       {/* 아바타 & 기본 정보 */}
       <div className="flex items-center gap-4">
         {/* 아바타 */}
-        <div
-          className={cn(
-            "w-14 h-14 flex items-center justify-center shrink-0 transition-all",
-            theme === "toss" &&
-              "rounded-2xl bg-[#E8F3FF] text-[#3182F6] font-bold text-2xl",
-            theme === "neobrutalism" &&
-              "rounded-xl border-2 border-black bg-[#F43F5E] text-white font-black text-2xl shadow-[3px_3px_0px_#000]",
-            theme === "glass" &&
-              "rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-600 text-white font-bold text-2xl shadow-[0_0_20px_rgba(56,189,248,0.5)] border border-cyan-400/40"
-          )}
-        >
-          {profile.avatarText || profile.name.charAt(0)}
-        </div>
+        <ProfileAvatar
+          avatarUrl={profile.avatarUrl}
+          avatarText={profile.avatarText}
+          name={profile.name}
+          theme={theme}
+          size="lg"
+        />
 
         {/* 이름, 역할 뱃지, 핸들 */}
         <div className="flex flex-col gap-0.5">

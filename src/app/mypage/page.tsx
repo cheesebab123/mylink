@@ -7,7 +7,9 @@ import { AddLinkDialog } from "@/components/link/AddLinkDialog";
 import { DeleteConfirmDialog } from "@/components/link/DeleteConfirmDialog";
 import { InlineEditLinkForm } from "@/components/link/InlineEditLinkForm";
 import { EditProfileModal } from "@/components/profile/EditProfileModal";
+import { ProfileAvatar } from "@/components/profile/ProfileAvatar";
 import { ThemeSwitcher } from "@/components/common/ThemeSwitcher";
+import { GoogleAuthButton } from "@/components/common/GoogleAuthButton";
 import { Toast } from "@/components/common/Toast";
 import { DynamicIcon } from "@/components/common/DynamicIcon";
 import { ThemeType, LinkItem, ProfileData } from "@/types";
@@ -176,41 +178,47 @@ export default function MyPage() {
       {/* 모바일 셸 컨테이너 (최대 440px) */}
       <main className="w-full max-w-[440px] px-4 sm:px-6 pt-3 flex flex-col gap-4 relative z-10">
         {/* 마이페이지 상단 헤더 */}
-        <header className="h-14 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <Link
-              href="/"
-              aria-label="메인 페이지로 돌아가기"
-              title="메인 페이지로 돌아가기"
-              className={cn(
-                "w-9 h-9 flex items-center justify-center transition-all cursor-pointer",
-                currentTheme === "toss" &&
-                  "rounded-full text-[#4E5968] hover:bg-[#F2F4F6] tds-pressable",
-                currentTheme === "neobrutalism" &&
-                  "rounded-lg border-2 border-black bg-white text-black shadow-[2px_2px_0px_#000] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[1px_1px_0px_#000]",
-                currentTheme === "glass" &&
-                  "rounded-xl bg-white/10 border border-white/20 text-slate-300 hover:text-white"
-              )}
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Link>
-            <h1
-              className={cn(
-                "tracking-tight transition-colors",
-                currentTheme === "toss" && "font-bold text-lg text-[#191F28]",
-                currentTheme === "neobrutalism" && "font-black text-xl text-black",
-                currentTheme === "glass" && "font-bold text-lg text-white"
-              )}
-            >
-              마이페이지
-            </h1>
+        <header className="flex flex-col gap-2 py-1">
+          <div className="h-12 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <Link
+                href="/"
+                aria-label="메인 페이지로 돌아가기"
+                title="메인 페이지로 돌아가기"
+                className={cn(
+                  "w-9 h-9 flex items-center justify-center transition-all cursor-pointer",
+                  currentTheme === "toss" &&
+                    "rounded-full text-[#4E5968] hover:bg-[#F2F4F6] tds-pressable",
+                  currentTheme === "neobrutalism" &&
+                    "rounded-lg border-2 border-black bg-white text-black shadow-[2px_2px_0px_#000] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[1px_1px_0px_#000]",
+                  currentTheme === "glass" &&
+                    "rounded-xl bg-white/10 border border-white/20 text-slate-300 hover:text-white"
+                )}
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </Link>
+              <h1
+                className={cn(
+                  "tracking-tight transition-colors",
+                  currentTheme === "toss" && "font-bold text-lg text-[#191F28]",
+                  currentTheme === "neobrutalism" && "font-black text-xl text-black",
+                  currentTheme === "glass" && "font-bold text-lg text-white"
+                )}
+              >
+                마이페이지
+              </h1>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <ThemeSwitcher
+                currentTheme={currentTheme}
+                onThemeChange={handleThemeChange}
+              />
+            </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <ThemeSwitcher
-              currentTheme={currentTheme}
-              onThemeChange={handleThemeChange}
-            />
+          <div className="flex items-center justify-end">
+            <GoogleAuthButton theme={currentTheme} />
           </div>
         </header>
 
@@ -227,19 +235,13 @@ export default function MyPage() {
           )}
         >
           <div className="flex items-center gap-3 min-w-0">
-            <div
-              className={cn(
-                "w-12 h-12 flex items-center justify-center font-bold text-base shrink-0 transition-all",
-                currentTheme === "toss" &&
-                  "rounded-2xl bg-[#E8F3FF] text-[#3182F6]",
-                currentTheme === "neobrutalism" &&
-                  "rounded-xl border-2 border-black bg-[#FEF08A] text-black shadow-[2px_2px_0px_#000] font-black",
-                currentTheme === "glass" &&
-                  "rounded-2xl bg-cyan-500/20 border border-cyan-400/40 text-cyan-300"
-              )}
-            >
-              {profile.avatarText || <User className="w-5 h-5" />}
-            </div>
+            <ProfileAvatar
+              avatarUrl={profile.avatarUrl}
+              avatarText={profile.avatarText}
+              name={profile.name}
+              theme={currentTheme}
+              size="md"
+            />
             <div className="flex flex-col min-w-0">
               <span
                 className={cn(

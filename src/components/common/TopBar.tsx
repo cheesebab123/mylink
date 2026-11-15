@@ -13,6 +13,7 @@ interface TopBarProps {
   onShare: () => void;
   onAddLink?: () => void;
   showMyPageBtn?: boolean;
+  showThemeSwitcher?: boolean;
 }
 
 export function TopBar({
@@ -21,6 +22,7 @@ export function TopBar({
   onShare,
   onAddLink,
   showMyPageBtn = true,
+  showThemeSwitcher = true,
 }: TopBarProps) {
   return (
     <header className="h-14 flex items-center justify-between gap-2">
@@ -52,7 +54,9 @@ export function TopBar({
 
       {/* 테마 스위처 & 마이페이지/링크 추가 & 공유 버튼 */}
       <div className="flex items-center gap-1.5 sm:gap-2">
-        <ThemeSwitcher currentTheme={theme} onThemeChange={onThemeChange} />
+        {showThemeSwitcher && (
+          <ThemeSwitcher currentTheme={theme} onThemeChange={onThemeChange} />
+        )}
 
         {showMyPageBtn && (
           <Link

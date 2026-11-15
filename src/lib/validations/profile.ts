@@ -1,10 +1,17 @@
 import { z } from "zod";
 
 export const editProfileSchema = z.object({
+  username: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .min(3, "username은 3자 이상 입력해주세요.")
+    .max(30, "username은 30자 이내로 입력해주세요.")
+    .regex(/^[a-z0-9_-]+$/, "영문 소문자, 숫자, -, _ 만 사용할 수 있습니다."),
   name: z
     .string()
-    .min(1, "이름을 입력해주세요.")
-    .max(30, "이름은 30자 이내로 입력해주세요."),
+    .min(1, "표시 이름을 입력해주세요.")
+    .max(30, "표시 이름은 30자 이내로 입력해주세요."),
   handle: z
     .string()
     .min(1, "핸들을 입력해주세요.")
